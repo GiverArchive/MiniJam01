@@ -22,6 +22,8 @@ import com.world.ObstacleGenerator;
 import com.world.World;
 
 public class Game extends Canvas implements Runnable, KeyListener {
+	private static final long serialVersionUID = 0L;
+	
 	public static final int WIDTH = 240;
 	public static final int HEIGHT = 160;
 
@@ -32,7 +34,7 @@ public class Game extends Canvas implements Runnable, KeyListener {
 	public static JFrame frame;
 	public static Spritesheet spritesheet;
 	public static World world;
-	public static State state = State.MENU;
+	public static State state = State.NORMAL;
 
 	public static List<Entity> entities;
 
@@ -109,9 +111,10 @@ public class Game extends Canvas implements Runnable, KeyListener {
 		g.setColor(Color.DARK_GRAY);
 		g.fillRect(0, 0, WIDTH, HEIGHT);
 
-		/* Renderização do jogo */
+		/* Renderizaï¿½ï¿½o do jogo */
 		world.render(g); // Primeira cois a ser renderizada
 		Graphics2D g2 = (Graphics2D) g;
+		
 		for (int i = 0; i < entities.size(); i++) {
 			Entity e = entities.get(i);
 			e.render(g);
@@ -138,7 +141,7 @@ public class Game extends Canvas implements Runnable, KeyListener {
 		Game game = new Game();
 		game.start();
 	}
-
+	
 	@Override
 	public void run() {
 		long lastTime = System.nanoTime(); // Pega o tempo do computador em nano segundo.
@@ -158,7 +161,7 @@ public class Game extends Canvas implements Runnable, KeyListener {
 				delta--;
 			}
 
-			if (System.currentTimeMillis() - timer >= 1000) { // Passou 1 segundo após a ultima vez que mostrou a
+			if (System.currentTimeMillis() - timer >= 1000) { // Passou 1 segundo apï¿½s a ultima vez que mostrou a
 																// mensagem
 				FPS = frames;
 				frames = 0;
@@ -177,16 +180,29 @@ public class Game extends Canvas implements Runnable, KeyListener {
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		if (e.getKeyCode() == KeyEvent.VK_D) {
-			player.right = true;
+		
+		switch (e.getKeyCode())
+		{
+			case KeyEvent.VK_SPACE:
+				player.jump = true;
+				break;
+			
+			default:
+				break;
 		}
 
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		if (e.getKeyCode() == KeyEvent.VK_D) {
-			player.right = false;
+		switch (e.getKeyCode())
+		{
+			case KeyEvent.VK_SPACE:
+				player.jump = false;
+				break;
+			
+			default:
+				break;
 		}
 
 	}

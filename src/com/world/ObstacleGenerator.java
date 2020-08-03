@@ -4,6 +4,7 @@ import java.util.Random;
 
 import com.entities.Obstacle;
 import com.main.Game;
+import com.main.Valores;
 
 public class ObstacleGenerator
 {
@@ -35,7 +36,7 @@ public class ObstacleGenerator
 
     private void createEntity()
     {
-        Obstacle obstacle = new Obstacle(Game.WIDTH, Game.HEIGHT - 30, 10, 10, null);
+        Obstacle obstacle = new Obstacle(Game.WIDTH, Valores.floor + 6, 10, 10, null);
         Game.entities.add(obstacle);
     }
 }

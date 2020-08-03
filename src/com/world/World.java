@@ -35,7 +35,7 @@ public class World {
 						// Player
 						Game.player.setX(xx * Valores.TILE_SIZE);
 						Game.player.setY(yy * Valores.TILE_SIZE);
-						tiles[xx + (yy * map.getWidth())] = new FloorTile(xx * Valores.TILE_SIZE, yy * Valores.TILE_SIZE, Tile.TILE_FLOOR);
+						tiles[xx + (yy * map.getWidth())] = new AirTile(xx * Valores.TILE_SIZE, yy * Valores.TILE_SIZE, Tile.TILE_SKY);
 					} else if (pixelAtual == 0xFF5ab6e9) {
 						// Background
 						tiles[xx + (yy * map.getWidth())] = new AirTile(xx * Valores.TILE_SIZE, yy * Valores.TILE_SIZE, Tile.TILE_SKY);
