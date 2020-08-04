@@ -6,5 +6,7 @@ public enum State
     MENU,
     EVOLUINDO,
     CUTSCENE,
+    CREDITS,
     GAME_OVER;
+	
 }
