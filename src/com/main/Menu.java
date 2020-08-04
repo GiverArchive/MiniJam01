@@ -48,7 +48,7 @@ public class Menu {
 		g.drawString("> LogoAqui <", 265, 100);
 
 		
-		// Opções de menu
+		// Opï¿½ï¿½es de menu
 		g.setColor(Color.white);
 		g.setFont(new Font("Arial", Font.BOLD, 30));
 		if (pause)

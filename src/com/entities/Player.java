@@ -35,7 +35,7 @@ public class Player extends Entity {
 	public Player(int x, int y, int width, int height, BufferedImage sprite) {
 		super(x, y, width, height, sprite);
 		rightPlayer = new BufferedImage[1];
-		rightPlayer[0] = Game.spritesheet.getSprite(0, 0, Valores.TILE_SIZE, Valores.TILE_SIZE);
+		rightPlayer[0] = Game.spritesheet.getSprite(0, 16, 44, 23);
 		
 	}
 	
@@ -49,14 +49,14 @@ public class Player extends Entity {
 		
 		advanceJump();
 		
-		Camera.x = Camera.clamp(this.getX()- (Game.WIDTH/2), 0, World.WIDTH* Valores.TILE_SIZE - Game.WIDTH);
-		Camera.y = Camera.clamp(this.getY()- (Game.HEIGHT/2), 0, World.HEIGHT* Valores.TILE_SIZE - Game.HEIGHT);
+		//Camera.x = Camera.clamp(this.getX()- (Game.WIDTH/2), 0, World.WIDTH* Valores.TILE_SIZE - Game.WIDTH, false);
+		//Camera.y = Camera.clamp(this.getY()- (Game.HEIGHT/2), 0, World.HEIGHT* Valores.TILE_SIZE - Game.HEIGHT, false);
 		
 	}
 	
 	public void render(Graphics g) {
 		if (dir == right_dir) {
-			g.drawImage(rightPlayer[0], this.getX() - Camera.x, this.getY() - Camera.y, null);
+			g.drawImage(rightPlayer[0], this.getX(), this.getY(), null);
 		}
 	}
 	
@@ -84,7 +84,7 @@ public class Player extends Entity {
 				signVsp = -1;
 			}
 			
-			while (moveAllowed((int) x, (int) (y + signVsp)))
+			while (moveAllowed((int) x, (int) (y + 0.1)))
 			{
 				y = y + signVsp;
 			}

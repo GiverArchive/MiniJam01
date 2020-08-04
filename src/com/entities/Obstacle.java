@@ -29,6 +29,6 @@ public class Obstacle extends Entity
     public void render(Graphics g)
     {
         g.setColor(Color.BLACK);
-        g.fillRect(getX() - Camera.x, getY() - Camera.y, width, height);
+        g.fillRect(getX(), getY(), width, height);
     }
 }
