@@ -64,7 +64,13 @@ public class Parallax {
 	public void dispatchRender(Graphics g)
 	{
 		renderCamada1(g);
+		renderCamada2(g);
+		renderCamada3(g);
+		renderCamada4(g);
+		renderCamada5(g);
+		renderCamada6(g);
 		renderCamada7(g);
+		renderCamada8(g);
 	}
 	
 	private void renderCamada1(Graphics g)

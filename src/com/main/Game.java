@@ -5,15 +5,12 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
 import com.entities.Entity;
@@ -31,6 +28,7 @@ public class Game extends Canvas implements Runnable, KeyListener
 	
 	public static int FPS = 0;
 	public static long OVERFLOW = 0;
+	public static int TICKS = 0;
 	
 	public static ObstacleGenerator generator;
 	public static Player player;
@@ -169,6 +167,7 @@ public class Game extends Canvas implements Runnable, KeyListener
 		g.setColor(Color.WHITE);
 		g.setFont(new Font("arial", Font.BOLD, 12));
 		g.drawString("FPS: " + FPS, 12, 12);
+		g.drawString("Ticks: " + TICKS, 12, 24);
 		g.drawString("Overflow: " + OVERFLOW, 12, 36);
 	}
 	
@@ -191,6 +190,7 @@ public class Game extends Canvas implements Runnable, KeyListener
 		double timer = System.currentTimeMillis();
 		
 		long overflow = 0;
+		int ticks = 0;
 		
 		boolean shouldTick = false;
 		boolean shouldRender = false;
@@ -224,6 +224,7 @@ public class Game extends Canvas implements Runnable, KeyListener
 			if(shouldTick)
 			{
 				shouldTick = false;
+				ticks++;
 				tick();
 			}
 			
@@ -231,7 +232,9 @@ public class Game extends Canvas implements Runnable, KeyListener
 			{ // Passou 1 segundo ap�s a ultima vez que mostrou a
 				// mensagem
 				FPS = frames;
+				TICKS = ticks;
 				frames = 0;
+				ticks = 0;
 				timer += 1000;
 				OVERFLOW = overflow;
 				overflow = 0;
@@ -276,7 +279,7 @@ public class Game extends Canvas implements Runnable, KeyListener
 		if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
 		{
 			state = State.MENU;
-			menu.pause = true;
+			Menu.pause = true;
 		}
 		if (e.getKeyCode() == KeyEvent.VK_M && state == State.CREDITS)
 		{
