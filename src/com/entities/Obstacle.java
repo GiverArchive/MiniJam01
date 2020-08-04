@@ -5,7 +5,6 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 import com.main.Valores;
-import com.world.Camera;
 
 public class Obstacle extends Entity
 {
@@ -23,12 +22,5 @@ public class Obstacle extends Entity
         {
             destroy();
         }
-    }
-
-    @Override
-    public void render(Graphics g)
-    {
-        g.setColor(Color.BLACK);
-        g.fillRect(getX(), getY(), width, height);
     }
 }

@@ -5,10 +5,9 @@ import java.awt.image.BufferedImage;
 
 import com.main.Game;
 import com.main.Valores;
-import com.world.Camera;
-import com.world.World;
 
-public class Player extends Entity {
+public class Player extends Entity
+{
 	
 	public boolean right, jump, isJumping, animChangeStage, moving;
 	
@@ -18,10 +17,9 @@ public class Player extends Entity {
 	public int right_dir = 0, up_dir = 1;
 	public int dir = right_dir;
 	
-	
 	public double speed = 2;
 	
-	private int frames = 0 , maxFrames  = 5, index = 0, maxIndex = 3;
+	private int frames = 0, maxFrames = 5, index = 0, maxIndex = 3;
 	private boolean moved = false;
 	
 	private BufferedImage[] rightPlayer;
@@ -32,31 +30,32 @@ public class Player extends Entity {
 	private double gravity = 0.4;
 	private double vspd = 0;
 	
-	public Player(int x, int y, int width, int height, BufferedImage sprite) {
+	public Player(int x, int y, int width, int height, BufferedImage sprite)
+	{
 		super(x, y, width, height, sprite);
 		rightPlayer = new BufferedImage[1];
 		rightPlayer[0] = Game.spritesheet.getSprite(0, 16, 44, 23);
 		
 	}
 	
-	public void tick() {
+	public void tick()
+	{
 		moved = false;
-		if(right) {
+		if (right)
+		{
 			moved = true;
 			dir = right_dir;
-			x+=speed;
+			x += speed;
 		}
 		
 		advanceJump();
-		
-		//Camera.x = Camera.clamp(this.getX()- (Game.WIDTH/2), 0, World.WIDTH* Valores.TILE_SIZE - Game.WIDTH, false);
-		//Camera.y = Camera.clamp(this.getY()- (Game.HEIGHT/2), 0, World.HEIGHT* Valores.TILE_SIZE - Game.HEIGHT, false);
-		
 	}
 	
-	public void render(Graphics g) {
-		if (dir == right_dir) {
-			g.drawImage(rightPlayer[0], this.getX(), this.getY(), null);
+	public void render(Graphics g)
+	{
+		if (dir == right_dir)
+		{
+			g.drawImage(rightPlayer[0], this.getX(), this.getY(), width * Valores.entityScale, height * Valores.entityScale, null);
 		}
 	}
 	
@@ -64,11 +63,11 @@ public class Player extends Entity {
 	{
 		vspd += gravity;
 		
-		if (jump && !moveAllowed(getX(), (int) (y + 1)) && moveAllowed(getX(), (int) (y -1)))
+		if (jump && !moveAllowed(getX(), (int) (y + 1)) && moveAllowed(getX(), (int) (y - 1)))
 		{
 			vspd = -6;
 			jump = false;
-			//Sound.jump.play();
+			// Sound.jump.play();
 		}
 		
 		if (!moveAllowed((int) x, (int) (y + vspd)))
@@ -110,7 +109,8 @@ public class Player extends Entity {
 				else
 					anim--;
 				
-				if ("Name" == "Name".toLowerCase() /*anim >= Entity.SPRITE_PLAYER_RIGHT.length - 1*/)
+				if ("Name" == "Name"
+						.toLowerCase() /* anim >= Entity.SPRITE_PLAYER_RIGHT.length - 1 */)
 				{
 					anim--;
 					animChangeStage = !animChangeStage;

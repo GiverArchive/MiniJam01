@@ -20,7 +20,7 @@ import com.entities.Entity;
 import com.entities.Player;
 import com.graphics.Spritesheet;
 import com.world.ObstacleGenerator;
-import com.world.World;
+import com.world.Parallax;
 
 public class Game extends Canvas implements Runnable, KeyListener
 {
@@ -36,7 +36,7 @@ public class Game extends Canvas implements Runnable, KeyListener
 	public static Player player;
 	public static JFrame frame;
 	public static Spritesheet spritesheet;
-	public static World world;
+	public static Parallax world;
 	public Menu menu;
 	public static State state = State.MENU;
 	
@@ -45,7 +45,6 @@ public class Game extends Canvas implements Runnable, KeyListener
 	public static boolean canGenerate = true;
 	
 	private Thread thread;
-	private BufferedImage image;
 	private boolean isRunning = true;
 	
 	public static int SCALE = 4;
@@ -55,18 +54,16 @@ public class Game extends Canvas implements Runnable, KeyListener
 		addKeyListener(this);
 		setPreferredSize(new Dimension(WIDTH * SCALE, HEIGHT * SCALE));
 		initFrame();
-		image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 		
 		// Inicializando Objetos
-		image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 		entities = new ArrayList<Entity>();
 		spritesheet = new Spritesheet("/spritesheetDino.png");
-		player = new Player(16, 16, Valores.TILE_SIZE, Valores.TILE_SIZE,
+		player = new Player(16, 16, 44, 23,
 				spritesheet.getSprite(0, 16, 44, 23));
 		entities.add(player);
 		
 		//world = new World("/mapDino.png");
-		world = new World();
+		world = new Parallax();
 		
 		menu = new Menu();
 		
@@ -105,9 +102,10 @@ public class Game extends Canvas implements Runnable, KeyListener
 	
 	public void tick()
 	{
-		
 		if (state == State.NORMAL)
 		{
+			world.advanceBackground();
+			
 			for (int i = 0; i < entities.size(); i++)
 			{
 				Entity e = entities.get(i);
@@ -139,29 +137,16 @@ public class Game extends Canvas implements Runnable, KeyListener
 			return;
 		}
 		
-		Graphics g = image.getGraphics();
-		g.setColor(Color.DARK_GRAY);
-		g.fillRect(0, 0, WIDTH, HEIGHT);
-		
-		g.drawImage(World.background, World.x1, 0, WIDTH, HEIGHT, null);
-		g.drawImage(World.background, World.x2, 0, WIDTH, HEIGHT, null);
+		Graphics g = bs.getDrawGraphics();
 		
 		/* Renderiza�ao do jogo */
 		
-		world.advance(); // Primeira coisa ser renderizada
-		Graphics2D g2 = (Graphics2D) g;
-		
-		for (int i = 0; i < entities.size(); i++)
-		{
-			Entity e = entities.get(i);
-			e.render(g);
-		}
+		world.dispatchRender(g);; // Primeira coisa ser renderizada
 		
 		/***/
-		g.dispose();
-		g = bs.getDrawGraphics();
-		g.drawImage(image, 0, 0, WIDTH * SCALE, HEIGHT * SCALE, null);
+
 		drawFPS(g);
+		
 		if (state == State.MENU)
 		{
 			menu.render(g);
@@ -207,6 +192,9 @@ public class Game extends Canvas implements Runnable, KeyListener
 		
 		long overflow = 0;
 		
+		boolean shouldTick = false;
+		boolean shouldRender = false;
+		
 		while (isRunning)
 		{
 			overflow++;
@@ -217,10 +205,26 @@ public class Game extends Canvas implements Runnable, KeyListener
 			
 			if (delta >= 1)
 			{
-				tick();
+				shouldTick = true;
+				delta--;
+			}
+			
+			if(delta >= 0.5)
+			{
+				shouldRender = true;
+			}
+			
+			if(shouldRender)
+			{
+				shouldRender = false;
 				render();
 				frames++;
-				delta--;
+			}
+			
+			if(shouldTick)
+			{
+				shouldTick = false;
+				tick();
 			}
 			
 			if (System.currentTimeMillis() - timer >= 1000)
@@ -292,7 +296,6 @@ public class Game extends Canvas implements Runnable, KeyListener
 			default:
 				break;
 		}
-		
 	}
 	
 }
