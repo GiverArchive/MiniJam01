@@ -24,7 +24,7 @@ public class Player extends Entity
 	
 	private BufferedImage[] rightPlayer;
 	
-	private DinoType dino = DinoType.T_REX;
+	private DinoType dino;
 	
 	// Gravidade
 	private double gravity = 0.4;
@@ -35,7 +35,7 @@ public class Player extends Entity
 		super(x, y, width, height, sprite);
 		rightPlayer = new BufferedImage[1];
 		rightPlayer[0] = Game.spritesheet.getSprite(0, 16, 44, 23);
-		
+		setType(DinoType.TRICERATOPS);
 	}
 	
 	public void tick()
@@ -55,7 +55,7 @@ public class Player extends Entity
 	{
 		if (dir == right_dir)
 		{
-			g.drawImage(rightPlayer[0], this.getX(), this.getY(), width * Valores.entityScale, height * Valores.entityScale, null);
+			g.drawImage(rightPlayer[0], this.getX(), this.getY(), width, height, null);
 		}
 	}
 	
@@ -131,6 +131,12 @@ public class Player extends Entity
 	public void setType(DinoType type)
 	{
 		this.dino = type;
+		this.height = type.height * Valores.entityScale;
+		this.width = type.width * Valores.entityScale;
+		this.maskX = type.maskX * Valores.entityScale;
+		this.maskY = type.maskY * Valores.entityScale;
+		this.maskW = type.maskW * Valores.entityScale;
+		this.maskH = type.maskH * Valores.entityScale;
 	}
 	
 	public DinoType type()

@@ -152,11 +152,11 @@ public class Game extends Canvas implements Runnable, KeyListener
 		
 		if (Game.state == State.CREDITS)
 		{
-			String texto = "Cr�ditos:";
+			String texto = "Cr\u00E9ditos:"; // Unicode: \u00E9 = E com acento agudo
 			g.setColor(Color.WHITE);
 			g.setFont(new Font("Arial", Font.BOLD, 40));
 			int x = (Game.WIDTH * Game.SCALE - g.getFontMetrics().stringWidth(texto)) / 2;
-			g.drawString("Cr�ditos:", x, 70);
+			g.drawString(texto, x, 70);
 		}
 		
 		bs.show();
