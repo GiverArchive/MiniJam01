@@ -2,6 +2,7 @@ package com.entities;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.util.Random;
 
 import com.main.Game;
 import com.main.Valores;
@@ -9,20 +10,21 @@ import com.main.Valores;
 public class Player extends Entity
 {
 	
-	public boolean right, jump, isJumping, animChangeStage, moving;
+	public boolean right, jump, isJumping, animChangeStage , moving;
 	
-	private int anim = 0;
-	private int anim_frames = 0;
+	private int anim, anim_jump = 0;
+	private int anim_frames, anim_frames_jump = 0;
 	
 	public int right_dir = 0, up_dir = 1;
 	public int dir = right_dir;
 	
 	public double speed = 2;
 	
-	private int frames = 0, maxFrames = 5, index = 0, maxIndex = 3;
+	private int maxFrames = 10;
+	private int maxFramesJump = 10;
 	private boolean moved = false;
 	
-	private BufferedImage[] rightPlayer;
+	private BufferedImage[] sprites, spritesJump;
 	
 	private DinoType dino;
 	
@@ -33,9 +35,7 @@ public class Player extends Entity
 	public Player(int x, int y, int width, int height, BufferedImage sprite)
 	{
 		super(x, y, width, height, sprite);
-		rightPlayer = new BufferedImage[1];
-		rightPlayer[0] = Game.spritesheet.getSprite(0, 16, 44, 23);
-		setType(DinoType.TRICERATOPS);
+		setType(DinoType.GALINHA);
 	}
 	
 	public void tick()
@@ -53,9 +53,13 @@ public class Player extends Entity
 	
 	public void render(Graphics g)
 	{
-		if (dir == right_dir)
+		if (!isJumping)
 		{
-			g.drawImage(rightPlayer[0], this.getX(), this.getY(), width, height, null);
+			g.drawImage(sprites[anim], this.getX(), this.getY(), width, height, null);
+		}
+		else
+		{
+			g.drawImage(spritesJump[anim_jump], this.getX(), this.getY(), width, height, null);
 		}
 	}
 	
@@ -65,7 +69,7 @@ public class Player extends Entity
 		
 		if (jump && !moveAllowed(getX(), (int) (y + 1)) && moveAllowed(getX(), (int) (y - 1)))
 		{
-			vspd = -6;
+			vspd = -9;
 			jump = false;
 			// Sound.jump.play();
 		}
@@ -93,31 +97,38 @@ public class Player extends Entity
 		
 		y = y + vspd;
 		
+		if(!isJumping)
+			isJumping = vspd < 0;
+		
 		if (isJumping)
 		{
+			anim_frames_jump++;
 			
-		} else if (moving)
+			if (anim_frames_jump >= maxFramesJump)
+			{
+				anim_frames_jump = 0;
+				
+				anim_jump++;
+				
+				if (anim_jump >= spritesJump.length)
+				{
+					anim_jump = 0;
+					isJumping = false;
+				}
+			}
+			
+		} else // rever
 		{
 			anim_frames++;
 			
 			if (anim_frames >= maxFrames)
 			{
 				anim_frames = 0;
+				anim++;
 				
-				if (!animChangeStage)
-					anim++;
-				else
-					anim--;
-				
-				if ("Name" == "Name"
-						.toLowerCase() /* anim >= Entity.SPRITE_PLAYER_RIGHT.length - 1 */)
+				if (anim >= sprites.length)
 				{
-					anim--;
-					animChangeStage = !animChangeStage;
-				} else if (anim < 0)
-				{
-					anim++;
-					animChangeStage = !animChangeStage;
+					anim = 0;
 				}
 			}
 		}
@@ -125,7 +136,7 @@ public class Player extends Entity
 	
 	public boolean moveAllowed(int x, int y)
 	{
-		return x < Game.WIDTH && x > 0 && y > 0 && y < Valores.floor;
+		return x < Game.WIDTH && x > 0 && y > 0 && y + height < Valores.floor;
 	}
 	
 	public void setType(DinoType type)
@@ -137,10 +148,34 @@ public class Player extends Entity
 		this.maskY = type.maskY * Valores.entityScale;
 		this.maskW = type.maskW * Valores.entityScale;
 		this.maskH = type.maskH * Valores.entityScale;
+		this.sprites = type.sprites;
+		this.spritesJump = type.jump;
+		
+		this.maxFrames = type.aF;
+		this.maxFramesJump = type.jumpF;
+		
+		this.y = Valores.floor - this.height - 10;
+		
+		if(isJumping)
+			isJumping = false;
+		
+		anim = 0;
+		anim_jump = 0;
+		
+		anim_frames_jump = 0;
+		anim_frames = 0;
 	}
 	
 	public DinoType type()
 	{
 		return this.dino;
+	}
+
+	public void change()
+	{
+		synchronized (this)
+		{
+			setType(DinoType.values()[new Random().nextInt(3)]);
+		}
 	}
 }

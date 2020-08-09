@@ -36,7 +36,7 @@ public class ObstacleGenerator
 
     private void createEntity()
     {
-        Obstacle obstacle = new Obstacle(Game.WIDTH * Game.SCALE, Valores.floor, 20, 40, Game.spritesheet.getSprite(48, 8, 16, 16));
+        Obstacle obstacle = new Obstacle(Game.WIDTH * Game.SCALE, Valores.floor - 32, 20, 40, Game.spritesheet.getSprite(48, 8, 16, 16));
         Game.entities.add(obstacle);
     }
 }

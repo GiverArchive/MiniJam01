@@ -17,7 +17,7 @@ public class Obstacle extends Entity
 	{
 		if(isColliding(Game.player))
 		{
-			System.out.println("Colidiu");
+			//System.out.println("Colidiu");
 		}
 		
 		x -= Valores.runSpeed;

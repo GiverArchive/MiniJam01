@@ -56,7 +56,7 @@ public class Game extends Canvas implements Runnable, KeyListener
 		// Inicializando Objetos
 		entities = new ArrayList<Entity>();
 		spritesheet = new Spritesheet("/spritesheetDino.png");
-		player = new Player(16, 16, 44, 23,
+		player = new Player(24, 24, 44, 23,
 				spritesheet.getSprite(0, 16, 44, 23));
 		entities.add(player);
 		
@@ -284,6 +284,11 @@ public class Game extends Canvas implements Runnable, KeyListener
 		if (e.getKeyCode() == KeyEvent.VK_M && state == State.CREDITS)
 		{
 			state = State.MENU;
+		}
+		
+		if (e.getKeyCode() == KeyEvent.VK_P && state == State.NORMAL)
+		{
+			player.change();
 		}
 	}
 	
