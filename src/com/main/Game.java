@@ -19,7 +19,7 @@ import com.graphics.Spritesheet;
 import com.world.ObstacleGenerator;
 import com.world.Parallax;
 
-public class Game extends Canvas implements Runnable, KeyListener
+public class Game extends Canvas implements KeyListener
 {
 	private static final long serialVersionUID = 0L;
 	
@@ -27,8 +27,7 @@ public class Game extends Canvas implements Runnable, KeyListener
 	public static final int HEIGHT = 135;
 	
 	public static int FPS = 0;
-	public static long OVERFLOW = 0;
-	public static int TICKS = 0;
+	public static long TICKS = 0;
 	
 	public static ObstacleGenerator generator;
 	public static Player player;
@@ -43,9 +42,13 @@ public class Game extends Canvas implements Runnable, KeyListener
 	public static boolean canGenerate = true;
 	
 	private Thread thread;
-	private boolean isRunning = true;
+	private Thread threadR;
+	
+	private static boolean isRunning = true;
 	
 	public static int SCALE = 4;
+	
+	private double distancia = 0;
 	
 	public Game()
 	{
@@ -60,12 +63,13 @@ public class Game extends Canvas implements Runnable, KeyListener
 				spritesheet.getSprite(0, 16, 44, 23));
 		entities.add(player);
 		
-		//world = new World("/mapDino.png");
 		world = new Parallax();
 		
 		menu = new Menu();
 		
 		generator = new ObstacleGenerator();
+		
+		//Sound.music.loop(0.6f);
 	}
 	
 	public void initFrame()
@@ -81,9 +85,65 @@ public class Game extends Canvas implements Runnable, KeyListener
 	
 	public synchronized void start()
 	{
-		Thread thread = new Thread(this);
+		thread = new Thread(() -> {
+			
+			requestFocus();
+			Game.isRunning = true;
+			long lastTime = System.nanoTime(); 
+			double amountOfTicks = 60.0;
+			double ns = 1000000000 / amountOfTicks;
+			double delta = 0;
+			int ticks = 0;
+			double timer = System.currentTimeMillis();
+			
+			while (isRunning)
+			{
+				long now = System.nanoTime();
+				delta += (now - lastTime) / ns;
+				lastTime = now;
+				
+				if (delta >= 1)
+				{
+					tick();
+					
+					ticks++;
+					delta--;
+				}
+				
+				if (System.currentTimeMillis() - timer >= 1000)
+				{
+					TICKS = ticks;
+					ticks = 0;
+					timer += 1000;
+				}
+			}
+			stop();
+			
+		});
+		
+		threadR = new Thread(() -> {
+			
+			int fps = 0;
+			long time = System.currentTimeMillis();
+			
+			while (isRunning)
+			{
+				render();
+				fps++;
+				
+				if(System.currentTimeMillis() - time >= 1000)
+				{
+					time = System.currentTimeMillis();
+					FPS = fps;
+					fps = 0;
+				}
+			}
+			
+		});
+		
 		thread.start();
-		isRunning = true;
+		threadR.start();
+		
 	}
 	
 	public synchronized void stop()
@@ -103,7 +163,7 @@ public class Game extends Canvas implements Runnable, KeyListener
 		if (state == State.NORMAL)
 		{
 			world.advanceBackground();
-			
+			generator.tick();
 			for (int i = 0; i < entities.size(); i++)
 			{
 				Entity e = entities.get(i);
@@ -114,8 +174,6 @@ public class Game extends Canvas implements Runnable, KeyListener
 			menu.tick();
 		}
 		
-		generator.tick();
-		
 		if (Menu.pause)
 		{
 			canGenerate = false;
@@ -124,6 +182,9 @@ public class Game extends Canvas implements Runnable, KeyListener
 			canGenerate = true;
 		}
 		
+		if(state == State.NORMAL){
+			distancia+=0.5;
+		}
 	}
 	
 	public void render()
@@ -142,7 +203,7 @@ public class Game extends Canvas implements Runnable, KeyListener
 		world.dispatchRender(g);; // Primeira coisa ser renderizada
 		
 		/***/
-
+		
 		drawFPS(g);
 		
 		if (state == State.MENU)
@@ -157,6 +218,15 @@ public class Game extends Canvas implements Runnable, KeyListener
 			g.setFont(new Font("Arial", Font.BOLD, 40));
 			int x = (Game.WIDTH * Game.SCALE - g.getFontMetrics().stringWidth(texto)) / 2;
 			g.drawString(texto, x, 70);
+			g.setFont(new Font("Arial", Font.ITALIC, 25));
+			g.drawString("Programação: Giver e Lívia;", 330, 130);
+			g.drawString("Design: Guilherme e Choice;", 330, 170);
+			g.drawString("Roteiro: Rei;", 400, 210);
+		}
+		
+		if(state == State.NORMAL) {
+			g.setFont(new Font("arial" , Font.BOLD , 18));
+			g.drawString("" +distancia, 889, 22);
 		}
 		
 		bs.show();
@@ -168,80 +238,12 @@ public class Game extends Canvas implements Runnable, KeyListener
 		g.setFont(new Font("arial", Font.BOLD, 12));
 		g.drawString("FPS: " + FPS, 12, 12);
 		g.drawString("Ticks: " + TICKS, 12, 24);
-		g.drawString("Overflow: " + OVERFLOW, 12, 36);
 	}
 	
 	public static void main(String[] args)
 	{
 		Game game = new Game();
 		game.start();
-	}
-	
-	@Override
-	public void run()
-	{
-		requestFocus();
-		long lastTime = System.nanoTime(); // Pega o tempo do computador em nano
-																				// segundo.
-		double amountOfTicks = 60.0; // 60 frames por segundo FPS
-		double ns = 1000000000 / amountOfTicks; // 1 segundo em nano/fps
-		double delta = 0;
-		int frames = 0;
-		double timer = System.currentTimeMillis();
-		
-		long overflow = 0;
-		int ticks = 0;
-		
-		boolean shouldTick = false;
-		boolean shouldRender = false;
-		
-		while (isRunning)
-		{
-			overflow++;
-			
-			long now = System.nanoTime();
-			delta += (now - lastTime) / ns;
-			lastTime = now;
-			
-			if (delta >= 1)
-			{
-				shouldTick = true;
-				delta--;
-			}
-			
-			if(delta >= 0.5)
-			{
-				shouldRender = true;
-			}
-			
-			if(shouldRender)
-			{
-				shouldRender = false;
-				render();
-				frames++;
-			}
-			
-			if(shouldTick)
-			{
-				shouldTick = false;
-				ticks++;
-				tick();
-			}
-			
-			if (System.currentTimeMillis() - timer >= 1000)
-			{ // Passou 1 segundo apï¿½s a ultima vez que mostrou a
-				// mensagem
-				FPS = frames;
-				TICKS = ticks;
-				frames = 0;
-				ticks = 0;
-				timer += 1000;
-				OVERFLOW = overflow;
-				overflow = 0;
-			}
-			
-		}
-		stop();
 	}
 	
 	@Override
@@ -254,42 +256,39 @@ public class Game extends Canvas implements Runnable, KeyListener
 	@Override
 	public void keyPressed(KeyEvent e)
 	{
-		
-		switch (e.getKeyCode())
+		if(state == State.NORMAL)
 		{
-			case KeyEvent.VK_SPACE:
+			if(e.getKeyCode() == KeyEvent.VK_SPACE)
+			{
 				player.jump = true;
-				break;
-			
-			default:
-				break;
+			}
+		}
+		else if(state == State.MENU)
+		{
+			if (e.getKeyCode() == KeyEvent.VK_DOWN)
+			{
+				menu.down = true;
+			} else if (e.getKeyCode() == KeyEvent.VK_UP)
+			{
+				menu.up = true;
+			}
+			else
+				if (e.getKeyCode() == KeyEvent.VK_ENTER)
+				{
+					menu.enter = true;
+				}
 		}
 		
-		if (e.getKeyCode() == KeyEvent.VK_DOWN && state == State.MENU)
-		{
-			menu.down = true;
-		} else if (e.getKeyCode() == KeyEvent.VK_UP && state == State.MENU)
-		{
-			menu.up = true;
-		}
-		if (e.getKeyCode() == KeyEvent.VK_ENTER && state == State.MENU)
-		{
-			menu.enter = true;
-		}
 		if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
 		{
 			state = State.MENU;
 			Menu.pause = true;
 		}
-		if (e.getKeyCode() == KeyEvent.VK_M && state == State.CREDITS)
-		{
-			state = State.MENU;
-		}
-		
-		if (e.getKeyCode() == KeyEvent.VK_P && state == State.NORMAL)
-		{
-			player.change();
-		}
+		else
+			if (e.getKeyCode() == KeyEvent.VK_P && state == State.NORMAL)
+			{
+				player.change();
+			}
 	}
 	
 	@Override
@@ -300,7 +299,7 @@ public class Game extends Canvas implements Runnable, KeyListener
 			case KeyEvent.VK_SPACE:
 				player.jump = false;
 				break;
-			
+				
 			default:
 				break;
 		}

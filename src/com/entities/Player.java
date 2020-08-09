@@ -5,20 +5,16 @@ import java.awt.image.BufferedImage;
 import java.util.Random;
 
 import com.main.Game;
+import com.main.Sound;
 import com.main.Valores;
 
 public class Player extends Entity
 {
 	
-	public boolean right, jump, isJumping, animChangeStage , moving;
+	public boolean jump, isJumping;
 	
 	private int anim, anim_jump = 0;
 	private int anim_frames, anim_frames_jump = 0;
-	
-	public int right_dir = 0, up_dir = 1;
-	public int dir = right_dir;
-	
-	public double speed = 2;
 	
 	private int maxFrames = 10;
 	private int maxFramesJump = 10;
@@ -40,14 +36,6 @@ public class Player extends Entity
 	
 	public void tick()
 	{
-		moved = false;
-		if (right)
-		{
-			moved = true;
-			dir = right_dir;
-			x += speed;
-		}
-		
 		advanceJump();
 	}
 	
@@ -71,7 +59,7 @@ public class Player extends Entity
 		{
 			vspd = -9;
 			jump = false;
-			// Sound.jump.play();
+			Sound.jump.play(0.85f);
 		}
 		
 		if (!moveAllowed((int) x, (int) (y + vspd)))
@@ -98,7 +86,9 @@ public class Player extends Entity
 		y = y + vspd;
 		
 		if(!isJumping)
+		{
 			isJumping = vspd < 0;
+		}
 		
 		if (isJumping)
 		{
@@ -114,6 +104,7 @@ public class Player extends Entity
 				{
 					anim_jump = 0;
 					isJumping = false;
+					Sound.jump.stop();
 				}
 			}
 			
